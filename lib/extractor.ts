@@ -9,9 +9,7 @@ export async function getReadableText(url: string): Promise<string> {
     }
 
     // Extract article content
-    const article = await extract(url, {
-      timeout: 10000,
-    });
+    const article = await extract(url);
 
     if (!article) {
       throw new Error('記事の内容を取得できませんでした。');
