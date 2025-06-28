@@ -53,7 +53,10 @@ export async function POST(request: NextRequest): Promise<NextResponse<Summarize
     // Generate summary using Gemini
     let summary: string;
     try {
-      summary = await summarize(readableText);
+      const clientId = request.headers.get('x-forwarded-for') || 
+                      request.headers.get('x-real-ip') || 
+                      'unknown';
+      summary = await summarize(readableText, clientId);
     } catch (error) {
       console.error('Summarization error:', error);
       return NextResponse.json(

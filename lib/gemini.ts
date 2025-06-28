@@ -1,3 +1,5 @@
+import { geminiRateLimiter } from './rateLimiter';
+
 interface GeminiResponse {
   candidates: Array<{
     content: {
@@ -22,7 +24,13 @@ function truncateToJapaneseCharacters(text: string, maxChars: number): string {
   return text.substring(0, maxChars - 1) + '…';
 }
 
-export async function summarize(text: string): Promise<string> {
+export async function summarize(text: string, clientId: string = 'default'): Promise<string> {
+  const rateLimitCheck = geminiRateLimiter.check(clientId);
+  
+  if (!rateLimitCheck.allowed) {
+    throw new Error(`リクエスト制限に達しました。1時間後に再試行してください。`);
+  }
+
   const apiKey = process.env.GEMINI_API_KEY;
   
   if (!apiKey) {
